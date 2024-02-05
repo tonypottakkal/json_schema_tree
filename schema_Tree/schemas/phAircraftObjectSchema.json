@@ -1,0 +1,168 @@
+{
+    "$id": "https://gitlab.graalquest.org/powderhornAircraftObjectSchema",
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "description":  "Schema version 2.5 for representing aircraft objects in a modular design to support their various properties and updates from selected Data Providers, including operational status and capabilities.  Developed by Jeremy Mize for AF TENCAP TALON Powderhorn.",
+    "type": "object",
+    "properties": {
+        "overallClassificationMarking": {"type": "string", "maxLength": 120, "description": "Security classification marking for the aircraft, including entities authorized to receive aircraft information."},
+        "objectUUID": {"type": "string", "format": "uuid", "description": "Based on the UUID5 standard, specific UUID for this aircraft."},
+        "affiliation": {"type": "string", "enum": ["CIV", "MIL", "GOV", "UNK"], "description": "Affiliation of the vessel (civilian, military, government, unknown)."},
+        "aircraftType": {"type": "string", "maxLength": 30, "description": "Type or model of the aircraft."},
+        "nationality": {"type": "string", "pattern": "^[A-Z]{3}$", "description": "GENC3 Trigraph country code associated with the vessel."},
+        "platform": {"type": "string", "maxLength": 30, "description": "Platform of the aircraft, e.g., fixed-wing, rotary-wing."},
+        "equipmentCode": {"type": "string", "maxLength": 5, "pattern": "^[A-Za-z0-9]{1,5}$", "description": "Alphanumeric code representing equipment, maximum 5 characters, e.g., AB45Z."},
+        "status": {
+            "type": "object",
+            "properties": {
+                "alt": {"type": "number", "description": "True altitude of the aircraft in feet above Mean Sea Level (MSL). Received as meters MSL, can also receive the 'altFt' variable, which converts the MSL to feet."},
+                "course": {"type": "number", "minimum": 0, "maximum": 360, "description": "Current heading of the aircraft in degrees."},
+                "identity": {"type": "string", "enum": ["Friend", "Foe", "Hostile", "Unknown"], "description": "Identification status of the vessel in operational terms (Friend, Fod, Hostile, or Unknown)."},
+                "iffMode3/A": {"type": "string", "maxLength": 10, "description": "Identification, Friend or Foe (IFF) Mode 3/A ICAO code -- military/civilian; provides a 4-digit octal (12 bit) identification code for the aircraft, assigned by Air Traffic Controller (ATC). From Thresher, labeled as iffMode1"},
+                "iffMode2": {"type": "string", "maxLength": 10, "description": "Identification, Friend or Foe (IFF) Mode 2 code, Military only; provides a 3-pulse reply."},
+                "latDD": {"type": "number", "minimum": -90, "maximum": 90, "description": "Latitude coordinates of the aircraft in decimal degrees."},
+                "lonDD": {"type": "number", "minimum": -180, "maximum": 180, "description": "Longitude coordinates of the aircraft in decimal degrees."},
+                "speed": {"type": "number", "minimum": 0, "description": "Speed of the aircraft in knots."},
+                "semiMajor": {"type": "number", "description": "The semi-major axis length, representing the longest radius of an ellipse in units (e.g., meters)."},
+                "semiMinor": {"type": "number", "description": "The semi-minor axis length, representing the shortest radius of an ellipse in units (e.g., meters)."},
+                "trackQuality": {"type": "string", "maxLength": 20, "description": "Quality of the tracking data, per Thresher algorithms."},
+                "lastUpdated": {"type": "string", "format": "date-time", "description": "The timestamp of when the update was received from the sensor or data provider."},
+                "sourceName": {"type": "string", "maxLength": 100, "description": "The name of the original source from which the data provider received the data."},
+                "sourceObjId": {"type": "string", "maxLength": 100, "description": "The unique identifier for the data provider that supplied the data."},
+                "dataMode": {"type": "string", "enum": ["REAL", "SIMULATED", "EXERCISE"], "description": "The mode of the data indicating whether it is real, simulated, or for an exercise."},
+                "sourceClassification": {"type": "string", "maxLength": 60, "description": "The classification marking of the data as provided by the source data provider."}
+            },
+            "required": ["alt", "course", "identity", "latDD", "lonDD", "speed", "lastUpdated", "sourceName", "sourceObjId", "dataMode", "sourceClassification"],
+            "additionalProperties": false
+        },
+        "ordnance": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "assetQty": {"type": ["integer", "null"], "description": "Quantity of the ordnance for the given asset."},
+                    "nalc": {"type": ["string", "null"], "maxLength": 10, "description": "Naval Ammunition Logistics Code (NALC) associated with the ordnance."},
+                    "nomenclature": {"type": ["string", "null"], "maxLength": 100, "description": "The official name of the ordnance."},
+                    "lastUpdated": {"type": ["string", "null"], "format": "date-time", "description": "The timestamp of when the ordnance data was last updated by the source provider."},
+                    "sourceName": {"type": ["string", "null"], "maxLength": 100, "description": "The name of the original source from which the ordnance data was received."},
+                    "sourceObjId": {"type": ["string", "null"], "maxLength": 100, "description": "The unique identifier for the data provider that supplied the ordnance data."},
+                    "dataMode": {"type": ["string", "null"], "enum": ["REAL", "SIMULATED", "EXERCISE"], "description": "The mode of the ordnance data indicating whether it is real, simulated, or for an exercise."},
+                    "sourceClassification": {"type": ["string", "null"], "maxLength": 60, "description": "The classification marking of the ordnance data as provided by the source data provider."}
+                },
+                "additionalProperties": false
+            },
+            "maxItems": 15
+        },
+	"fuel": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "productType": {"type": "string", "description": "Type of fuel available on the vessel."},
+                    "fuelQty": {"type": "number", "minimum": 0, "description": "Quantity of fuel available on the vessel."},
+                    "lastUpdated": {"type": ["string", "null"], "format": "date-time", "description": "The timestamp of when the fuel data was last updated by the original source provider."},
+                    "sourceName": {"type": ["string", "null"], "maxLength": 100, "description": "The name of the original source from which the fuel data was received."},
+                    "sourceObjId": {"type": ["string", "null"], "maxLength": 100, "description": "The unique identifier for the data provider that supplied the fuel data."},
+                    "dataMode": {"type": ["string", "null"], "enum": ["REAL", "SIMULATED", "EXERCISE"], "description": "The mode of the fuel data indicating whether it is real, simulated, or for an exercise."},
+                    "sourceClassification": {"type": ["string", "null"], "maxLength": 60, "description": "The classification marking of the fuel data as provided by the source data provider."}
+                },
+                "additionalProperties": false
+            },
+                "description": "Information about fuel types and quantities available on the aircraft."
+            }
+        },
+        "aircraftMissionInfo": {
+            "type": "object",
+            "properties": {
+                "callsign": {"type": "string", "maxLength": 20, "description": "The aircraft's callsign for the mission"},
+                "classification": {"type": "string", "maxLength": 20, "description": "The classification level of the aircraft's mission."},
+                "destination": {"type": "string", "maxLength": 50, "description": "The aircraft's mission destination."},
+                "distFlown": {"type": "number", "description": "Distance flown during the mission, in kilometers."},
+                "flightDuration": {"type": "string", "description": "Time duration of the flight, in ISO 8601 time duration format."},
+                "linkOperationalStatus": {"type": "string", "maxLength": 20, "description": "Operational status of the connection to the Link-16 source platform."},
+                "linkPlatformName": {"type": "string", "maxLength": 50, "description": "Platform's unique ID in Link-16."},
+                "linkPPLI": {"type": "string", "maxLength": 20, "description": "Precise Participant Location and Identification (PPLI) information in Link-16."},
+                "linkReportingUnit": {"type": "string", "maxLength": 50, "description": "Aircraft's reporting unit according to Link-16."},
+                "linkSensorId": {"type": "string", "maxLength": 20, "description": "Identifier of the connected sensor Link-16."},
+                "linkSpecificTypeName": {"type": "string", "maxLength": 50, "description": "Aircraft's specific type name in Link-16."},
+                "linkTrackNumber": {"type": "string", "maxLength": 20, "description": "Aircraft's Link-16 designated track number."},
+                "origin": {"type": "string", "maxLength": 50, "description": "Aircraft's mission origin."},
+                "lastUpdated": {"type": "string", "format": "date-time", "description": "The timestamp of when the update was received from the source sensor or original data provider."},
+                "sourceName": {"type": "string", "maxLength": 100, "description": "The name of the original source from which the data provider received the data."},
+                "sourceObjId": {"type": "string", "maxLength": 100, "description": "The unique identifier for the data provider that supplied the data."},
+                "dataMode": {"type": "string", "enum": ["REAL", "SIMULATED", "EXERCISE"], "description": "The mode of the data indicating whether it is real, simulated, or for an exercise."},
+                "sourceClassification": {"type": "string", "maxLength": 60, "description": "The classification marking of the data as provided by the original data provider."}
+            },
+            "additionalProperties": false
+        },
+        "aircraftRef": {
+            "type": "object",
+            "properties": {
+                "airframe": {"type": "string", "maxLength": 50, "description": "The aircraft's airframe type."},
+                "bft": {"type": "string", "maxLength": 20, "description": "The aircraft's Battlefield Telecommunications (BFT) radio ID."},
+                "icao": {"type": "string", "maxLength": 20, "description": "The ICAO code associating with the aircraft's 'home airport' location."},
+                "manufacturer": {"type": "string", "maxLength": 50, "description": "Manufacturer of the aircraft."},
+                "modeS": {"type": "string", "maxLength": 20, "description": "The Mode-Select (Mode-S) transponder code for the aircraft."},
+                "nickname": {"type": "string", "maxLength": 50, "description": "Nickname of the aircraft."},
+                "operator": {"type": "string", "maxLength": 50, "description": "Operator of the aircraft."},
+                "owner": {"type": "string", "maxLength": 50, "description": "Owner of the aircraft."},
+                "parent": {"type": "string", "maxLength": 50, "description": "Parent organization that owns the aircraft, if the aircraft is owned by an organization."},
+                "registration": {"type": "string", "maxLength": 20, "description": "Registration number of the aircraft."},
+                "tailNumber": {"type": "string", "maxLength": 20, "description": "Tail number of the aircraft."},
+                "lastUpdated": {"type": "string", "format": "date-time", "description": "The timestamp of when the update was received from the source sensor or original data provider."},
+                "sourceName": {"type": "string", "maxLength": 100, "description": "The name of the original source from which the data provider received the data."},
+                "sourceObjId": {"type": "string", "maxLength": 100, "description": "The unique identifier for the original data provider that supplied the data."},
+                "dataMode": {"type": "string", "enum": ["REAL", "SIMULATED", "EXERCISE"], "description": "The mode of the data indicating whether it is real, simulated, or for an exercise."},
+                "sourceClassification": {"type": "string", "maxLength": 60, "description": "The classification marking of the data as provided by the data provider."}
+            },
+            "required": ["airframe", "tailNumber", "lastUpdated", "sourceName", "sourceObjId", "dataMode", "sourceClassification"],
+            "additionalProperties": false
+        },
+        "platformRef": {
+            "type": "object",
+            "properties": {
+                "cruisespeed": {"type": "number", "description": "The cruising speed of the aircraft, in kilometers per hour."},
+                "height": {"type": "number", "description": "Height of the aircraft, in meters."},
+                "length": {"type": "number", "description": "Length of the aircraft, in meters."},
+                "maxFuel": {"type": "number", "description": "Maximum fuel capacity of the aircraft, in liters."},
+                "mtow": {"type": "number", "description": "Maximum Takeoff Weight (MTOW) of the aircraft, in kilograms."},
+                "range": {"type": "number", "description": "Range of the aircraft, in kilometers."},
+                "serviceCeiling": {"type": "number", "description": "Service ceiling of the aircraft, in meters."},
+                "sprintCruise": {"type": "number", "description": "Sprint cruise speed of the aircraft, in kilometers per hour."},
+                "wingspan": {"type": "number", "description": "Wingspan of the aircraft, in meters."},
+                "lastUpdated": {"type": "string", "format": "date-time", "description": "The timestamp of when the update was received from the source sensor or original data provider."},
+                "sourceName": {"type": "string", "maxLength": 100, "description": "The name of the original source from which the data provider received the data."},
+                "sourceObjId": {"type": "string", "maxLength": 100, "description": "The unique identifier for the original data provider that supplied the data."},
+                "dataMode": {"type": "string", "enum": ["REAL", "SIMULATED", "EXERCISE"], "description": "The mode of the data indicating whether it is real, simulated, or for an exercise."},
+                "sourceClassification": {"type": "string", "maxLength": 60, "description": "The classification marking of the data as provided by the data provider."}
+            },
+            "required": ["cruisespeed", "height", "length", "maxFuel", "mtow", "range", "serviceCeiling", "wingspan", "lastUpdated", "sourceName", "sourceObjId", "dataMode", "sourceClassification"],
+            "additionalProperties": false
+        },
+        "associations": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                    "assocObjId": {"type": "string", "maxLength": 40, "description": "UUID of the associated object."},
+                    "assocType": {"type": "string", "maxLength": 40, "description": "Type of association between the associated object."}
+                },
+                "required": ["assocObjId"],
+                "title": "associations",
+                "description": "Information providing the type of association and the UUID of the associated object, providing the associations with other entities or objects."
+            },
+            "maxItems": 15
+        },
+        "latestObjectUpdate": {
+    "type": "object",
+    "properties": {
+        "sourceName": {"type": "string", "maxLength": 24, "description": "Name of the data source."},
+        "sourceObjId": {"type": "string", "maxLength": 40, "description": "Unique identifier of the data source object."},
+        "lastUpdate": {"type": "string", "format": "date-time", "description": "Timestamp of the last update from this data source."}
+    },
+    "required": ["lastUpdate", "sourceName", "sourceObjId"],
+    "description": "Information about the latest update received for the object."
+    },
+    "required": ["objectUUID", "overallClassificationMarking", "aircraftType", "nationality", "platform", "status", "aircraftMissionInfo", "aircraftRef", "platformRef", "latestObjectUpdate"],
+    "additionalProperties": false
+}
