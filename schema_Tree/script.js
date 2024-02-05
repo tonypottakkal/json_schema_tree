@@ -20,22 +20,20 @@ function readFileContent(file) {
 function transformData(data) {
     // Function to transform schema into a hierarchical format
     function buildHierarchy(item) {
-        // Base case: if there are no further properties, return
-        if (typeof item.properties !== 'object') return { name: item.type, children: [] };
-
-        let children = Object.keys(item.properties).map(key => {
-            return {
-                name: key,
-                type: item.properties[key].type,
-                // Recursive call to build hierarchy
-                children: buildHierarchy(item.properties[key])
-            };
-        });
-
-        return {
-            name: item.$id || 'Root',
-            children: children
-        };
+        // Function to recursively build the hierarchy from the schema
+        function recurse(name, obj) {
+            const node = { name: name };
+            if (obj.type && obj.type === 'object' && obj.properties) {
+                node.children = Object.entries(obj.properties).map(([key, value]) => 
+                    recurse(key, value)
+                );
+            } else if (obj.type && obj.type === 'array' && obj.items) {
+                // Assuming arrays contain objects
+                node.children = [recurse(name, obj.items)];
+            }
+            return node;
+        }
+        return recurse('Root', item); // Start recursion with the root item
     }
 
     return buildHierarchy(data);
