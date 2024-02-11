@@ -1,0 +1,54 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "id": "person_object",
+    "description": "Schema for the person Object",
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string",
+        "description": "The name of the person Object"
+      },
+      "age": {
+        "type": "integer",
+        "description": "The age of the person Object"
+      },
+      "isAlive": {
+        "type": "boolean",
+        "description": "Indicates if the person Object is alive"
+      },
+      "location": {
+        "type": "object",
+        "description": "The location of the person Object",
+        "properties": {
+          "latitude": {
+            "type": "number",
+            "description": "The latitude coordinate"
+          },
+          "longitude": {
+            "type": "number",
+            "description": "The longitude coordinate"
+          }
+        },
+        "required": ["latitude", "longitude"]
+      },
+      "friends": {
+        "type": "array",
+        "description": "List of friends of the person Object",
+        "items": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "The name of the friend"
+            },
+            "age": {
+              "type": "integer",
+              "description": "The age of the friend"
+            }
+          },
+          "required": ["name", "age"]
+        }
+      }
+    },
+    "required": ["name", "age", "isAlive", "location"]
+  }

@@ -20,6 +20,10 @@ The schema of datasets is often represented in a .json file according to the JSO
 3. Open the `index.html`, in a supported webrowser.
 4. Click on choose file and select a json schem file to view the visualization.
 
+## Example
+
+For a demonstration of how the JSON schema is visualized as a collapsible tree, you can upload the "person_object_schema.json" file. You may have to adjust the zoom on your browser. 
+
 ## External Resources
 
 - A similar project for JSON data visualization as a collapsible tree can be found at [ranvirparmar/d3interactivetree](https://github.com/ranvirparmar/d3interactivetree).
